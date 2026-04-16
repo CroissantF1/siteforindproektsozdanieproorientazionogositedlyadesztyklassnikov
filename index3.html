@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ПрофНавигатор — выбор профессии для старшеклассников</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e9eef5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Общие стили для карточек */
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            background: white;
+            border-radius: 32px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .header .tagline {
+            color: #2c5282;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 20px;
+            border-left: 5px solid #3182ce;
+            padding-left: 16px;
+        }
+
+        /* Инструкция на Шаге 1 */
+        .instruction {
+            background: #ebf8ff;
+            border-left: 5px solid #3182ce;
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin: 16px 0 20px 0;
+            font-size: 0.95rem;
+            color: #2a4365;
+        }
+
+        .instruction strong {
+            color: #1e3c72;
+        }
+
+        /* Цели на главной странице */
+        .goal-list {
+            margin: 20px 0;
+            padding-left: 24px;
+        }
+        .goal-list li {
+            margin: 12px 0;
+            line-height: 1.5;
+        }
+
+        /* Кнопки */
+        .start-btn, .restart-main-btn {
+            background: #3182ce;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-block;
+        }
+        .start-btn:hover, .restart-main-btn:hover {
+            background: #2b6cb0;
+            transform: scale(1.02);
+        }
+
+        button {
+            background: #3182ce;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover:not(:disabled) {
+            background: #2b6cb0;
+            transform: scale(1.02);
+        }
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .question {
+            margin-bottom: 28px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .question-text {
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: #1a365d;
+            font-size: 1.05rem;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .opt-btn {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: #1e293b;
+        }
+        .opt-btn strong {
+            font-size: 1.1rem;
+            color: #2c5282;
+            margin-right: 4px;
+        }
+        .opt-btn:hover {
+            background: #e6f0ff;
+            border-color: #3182ce;
+        }
+        .opt-btn.selected {
+            background: #3182ce;
+            border-color: #1e3c72;
+            color: white;
+        }
+        .opt-btn.selected strong {
+            color: white;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .salary-value {
+            background: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .result-card {
+            background: #f0fff4;
+            border-left: 6px solid #38a169;
+            margin-bottom: 16px;
+            padding: 20px;
+            border-radius: 20px;
+        }
+        .prof-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #22543d;
+        }
+        .prof-detail {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .badge {
+            background: #e6fffa;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+        }
+        .more-btn {
+            background: #38a169;
+            margin-top: 15px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+        .more-btn:hover {
+            background: #2f855a;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #4a5568;
+            font-size: 0.85rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 28px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #888;
+        }
+        .modal-close:hover {
+            color: #000;
+        }
+        .modal h3 {
+            color: #1e3c72;
+            margin-bottom: 16px;
+        }
+        .modal h4 {
+            margin-top: 16px;
+            color: #2c5282;
+        }
+
+        @media (max-width: 700px) {
+            .card { padding: 20px; }
+            .opt-btn { padding: 8px 16px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Шапка общая для всех режимов -->
+    <div class="header">
+        <h1>🧭 ПрофНавигатор</h1>
+        <div class="tagline">Найди профессию, которая подходит ТЕБЕ — по интересам, способностям и рынку труда</div>
+    </div>
+
+    <!-- ========== ГЛАВНАЯ СТРАНИЦА ========== -->
+    <div id="mainPage" class="card">
+        <h3>🎯 О чём этот проект?</h3>
+        <ul class="goal-list">
+            <li>✅ <strong>Помочь тебе осознанно выбрать профессию</strong> — не случайно, а с опорой на твои интересы и способности.</li>
+            <li>✅ <strong>Учесть реальные условия рынка труда</strong> — зарплаты, востребованность, возможность удалённой работы.</li>
+            <li>✅ <strong>Дать конкретные ориентиры</strong> — где учиться в Новосибирске, какие экзамены сдавать, что ждёт после вуза.</li>
+            <li>✅ <strong>Снизить тревожность перед выбором</strong> — ты получишь не один «правильный» ответ, а список направлений, которые тебе подходят.</li>
+        </ul>
+
+        <div class="instruction">
+            📌 <strong>Как пользоваться навигатором:</strong><br>
+            1️⃣ <strong>Шаг 1. Интересы</strong> — ответь на 10 вопросов о том, что тебе нравится (выбирай вариант А, Б, В, Г или Д).<br>
+            2️⃣ <strong>Шаг 2. Способности</strong> — отметь предметы, которые тебе даются лучше всего.<br>
+            3️⃣ <strong>Шаг 3. Внешние факторы</strong> — укажи желаемую зарплату, важность востребованности и условия труда.<br>
+            4️⃣ <strong>Результат</strong> — получи топ‑5 профессий с подробным описанием, экзаменами и вузами Новосибирска.
+        </div>
+
+        <button id="startTestBtn" class="start-btn">🚀 Начать подбор профессии →</button>
+    </div>
+
+    <!-- ========== ШАГ 1. ТЕСТ (интересы) ========== -->
+    <div id="step1" class="card hidden">
+        <div class="step-title">📌 Шаг 1. Твои интересы</div>
+        <div class="instruction">
+            📌 <strong>Инструкция:</strong> Выберите наиболее предпочтительный вариант ответа на каждый вопрос.
+        </div>
+        <div id="interests-questions"></div>
+        <div class="nav-buttons">
+            <button id="toMainFromStep1" class="restart-main-btn">🏠 На главную</button>
+            <button id="nextStep2" disabled>Далее →</button>
+        </div>
+    </div>
+
+    <!-- ========== ШАГ 2. СПОСОБНОСТИ ========== -->
+    <div id="step2" class="card hidden">
+        <div class="step-title">📚 Шаг 2. Твои сильные стороны</div>
+        <div id="subjects-block"></div>
+        <div class="nav-buttons">
+            <button id="backStep1">← Назад</button>
+            <button id="nextStep3" disabled>Далее →</button>
+        </div>
+    </div>
+
+    <!-- ========== ШАГ 3. ВНЕШНИЕ ФАКТОРЫ ========== -->
+    <div id="step3" class="card hidden">
+        <div class="step-title">💰 Шаг 3. Важные внешние факторы</div>
+        <div class="filter-group">
+            <span class="filter-label">💵 Минимальная желаемая зарплата (тыс. руб/мес)</span>
+            <input type="range" id="salaryFilter" min="20" max="150" step="5" value="40">
+            <span id="salaryDisplay" class="salary-value">40 000 ₽</span>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">📈 Востребованность профессии</span>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="highDemand" checked> Высокая востребованность</label>
+                <label><input type="checkbox" id="midDemand" checked> Средняя</label>
+                <label><input type="checkbox" id="lowDemand"> Низкая (риск)</label>
+            </div>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">🏡 Условия труда</span>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="remoteOk"> Удалённая работа</label>
+                <label><input type="checkbox" id="creativeOk"> Творческая работа</label>
+                <label><input type="checkbox" id="officeOk"> Офис/кабинет</label>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button id="backStep2">← Назад</button>
+            <button id="getResults">🔍 Подобрать профессии</button>
+        </div>
+    </div>
+
+    <!-- ========== РЕЗУЛЬТАТЫ ========== -->
+    <div id="results" class="card hidden">
+        <div class="step-title">✅ Твои персональные рекомендации</div>
+        <div id="resultsList"></div>
+        <div class="nav-buttons">
+            <button id="restartBtn">🔄 Пройти заново</button>
+            <button id="toMainFromResults" class="restart-main-btn">🏠 На главную</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        📍 Проект для СОШ №43 Новосибирск | Данные по зарплатам: hh.ru
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div id="profModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    // ==================== БАЗА ПРОФЕССИЙ ====================
+    const fullDB = [
+        { name: "Аналитик данных", type: "В", subjects: ["информатика","математика"], salary: 95, demand: "высокая", remote: true, creative: false, office: true,
+          description: "Собирает и интерпретирует данные, помогает бизнесу. Работает с SQL, Python.",
+          exam: "Математика, информатика", universities: "НГУ (ФИТ), НГТУ (АВТФ), СибГУТИ", prospects: "Зарплата джуниора от 80 тыс., сеньора — до 250 тыс." },
+        { name: "Программист Python", type: "В", subjects: ["информатика","математика"], salary: 120, demand: "высокая", remote: true, creative: false, office: true,
+          description: "Разрабатывает веб-приложения, ботов, автоматизацию.", exam: "Информатика, математика", universities: "НГУ, НГТУ, СибГУТИ", prospects: "Зарплата от 100 тыс., удалёнка — стандарт." },
+        { name: "Врач (терапевт)", type: "А", subjects: ["биология","химия"], salary: 65, demand: "высокая", remote: false, creative: false, office: false,
+          description: "Диагностирует и лечит внутренние болезни.", exam: "Химия, биология", universities: "НГМУ", prospects: "Всегда востребовано." },
+        { name: "UX/UI-дизайнер", type: "Д", subjects: ["информатика","рисование"], salary: 100, demand: "средняя", remote: true, creative: true, office: true,
+          description: "Проектирует удобные интерфейсы.", exam: "Информатика, рисунок", universities: "НГУАДИ, НГТУ", prospects: "Зарплата от 70 тыс." },
+        { name: "Медицинская сестра", type: "А", subjects: ["биология","химия"], salary: 45, demand: "высокая", remote: false, creative: false, office: false,
+          description: "Помогает врачу, ухаживает за пациентами.", exam: "Биология", universities: "Новосибирский медицинский колледж, НГМУ", prospects: "Стабильная занятость." },
+        { name: "Учитель", type: "А", subjects: ["любой"], salary: 40, demand: "высокая", remote: false, creative: false, office: false,
+          description: "Преподаёт предмет в школе.", exam: "Русский, обществознание", universities: "НГПУ", prospects: "Острая нехватка учителей." },
+        { name: "Инженер-строитель", type: "Б", subjects: ["физика","математика"], salary: 70, demand: "средняя", remote: false, creative: false, office: true,
+          description: "Проектирует здания, рассчитывает нагрузки.", exam: "Физика, математика", universities: "НГАСУ (Сибстрин)", prospects: "Зарплата 60-110 тыс." },
+        { name: "Психолог", type: "А", subjects: ["биология","обществознание"], salary: 50, demand: "средняя", remote: false, creative: false, office: true,
+          description: "Помогает людям справляться с кризисами.", exam: "Биология, обществознание", universities: "НГПУ, НГМУ", prospects: "Частная практика приносит больше." },
+        { name: "Специалист по кибербезопасности", type: "В", subjects: ["информатика","математика"], salary: 130, demand: "высокая", remote: true, creative: false, office: true,
+          description: "Защищает данные от взломов.", exam: "Информатика, математика", universities: "НГТУ (ФБ), СибГУТИ", prospects: "Дефицит кадров, зарплата от 150 тыс." },
+        { name: "Электромонтёр", type: "Б", subjects: ["физика","технология"], salary: 55, demand: "высокая", remote: false, creative: false, office: false,
+          description: "Монтирует и ремонтирует электрооборудование.", exam: "Физика", universities: "НЭТК, НКЭиП", prospects: "Зарплата 50-80 тыс." }
+    ];
+
+    // 10 вопросов для интересов
+    const interestQuestions = [
+        { text: "Что вам интереснее всего делать в свободное время?", options: { "А": "Общаться с друзьями, помогать людям", "Б": "Разбирать и собирать технику, ремонтировать", "В": "Решать головоломки, работать с цифрами", "Г": "Ухаживать за растениями или животными", "Д": "Рисовать, петь, заниматься творчеством" } },
+        { text: "Какой школьный предмет вам нравится больше всего?", options: { "А": "Литература, история, обществознание", "Б": "Физика, информатика, технология", "В": "Математика, экономика", "Г": "Биология, география, химия", "Д": "ИЗО, музыка, МХК" } },
+        { text: "Какую работу вы предпочли бы на летних каникулах?", options: { "А": "Вожатый, волонтёр", "Б": "Помощник автомеханика", "В": "Работа с документами", "Г": "Работа с растениями", "Д": "Помощник дизайнера" } },
+        { text: "Какую профессию вы бы никогда не выбрали?", options: { "А": "Врач, учитель", "Б": "Слесарь, водитель", "В": "Бухгалтер", "Г": "Ветеринар", "Д": "Художник" } },
+        { text: "Что важнее всего в будущей работе?", options: { "А": "Общение с людьми", "Б": "Работа руками", "В": "Чёткие правила", "Г": "Работа на природе", "Д": "Творчество" } },
+        { text: "О какой работе вы мечтаете?", options: { "А": "Психолог", "Б": "Инженер", "В": "Аналитик", "Г": "Эколог", "Д": "Дизайнер" } },
+        { text: "В какой сфере открыть бизнес?", options: { "А": "Образование", "Б": "Автосервис", "В": "Консалтинг", "Г": "Фермерство", "Д": "Студия дизайна" } },
+        { text: "Какой фильм предпочтёте?", options: { "А": "Про людей", "Б": "Про технику", "В": "Про бизнес", "Г": "Про природу", "Д": "Про искусство" } },
+        { text: "Какой кружок вы бы вели?", options: { "А": "Психологический", "Б": "Робототехника", "В": "Шахматы", "Г": "Юный натуралист", "Д": "Театральный" } },
+        { text: "Какая похвала приятнее?", options: { "А": "Ладите с людьми", "Б": "Мастер на все руки", "В": "Аналитический ум", "Г": "Заботитесь о живом", "Д": "Творческий человек" } }
+    ];
+
+    const subjectList = ["математика", "русский", "информатика", "физика", "биология", "химия", "история", "обществознание", "рисование", "литература", "география", "технология"];
+
+    // Переменные состояния
+    let userAnswers = new Array(10).fill(null);
+    let userSubjects = [];
+
+    // ==================== ФУНКЦИИ ====================
+    function renderStep1() {
+        const container = document.getElementById("interests-questions");
+        container.innerHTML = "";
+        interestQuestions.forEach((q, idx) => {
+            const div = document.createElement("div");
+            div.className = "question";
+            let optionsHtml = `<div class="question-text">${idx+1}. ${q.text}</div><div class="options" data-qidx="${idx}">`;
+            for (let [letter, text] of Object.entries(q.options)) {
+                const isSelected = (userAnswers[idx] === letter);
+                optionsHtml += `<button type="button" class="opt-btn ${isSelected ? 'selected' : ''}" data-letter="${letter}"><strong>${letter})</strong> ${text}</button>`;
+            }
+            optionsHtml += `</div>`;
+            div.innerHTML = optionsHtml;
+            container.appendChild(div);
+        });
+
+        document.querySelectorAll(".options").forEach(optGroup => {
+            const qidx = parseInt(optGroup.dataset.qidx);
+            optGroup.querySelectorAll(".opt-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const letter = btn.dataset.letter;
+                    userAnswers[qidx] = letter;
+                    optGroup.querySelectorAll(".opt-btn").forEach(b => b.classList.remove("selected"));
+                    btn.classList.add("selected");
+                    checkStep1Complete();
+                });
+            });
+        });
+    }
+
+    function checkStep1Complete() {
+        const allSelected = userAnswers.every(ans => ans !== null);
+        document.getElementById("nextStep2").disabled = !allSelected;
+    }
+
+    function calculateInterestType() {
+        const scores = { "А": 0, "Б": 0, "В": 0, "Г": 0, "Д": 0 };
+        for (let answer of userAnswers) {
+            if (answer && scores[answer] !== undefined) scores[answer]++;
+        }
+        let maxType = "А";
+        let maxCount = 0;
+        for (let [type, count] of Object.entries(scores)) {
+            if (count > maxCount) { maxCount = count; maxType = type; }
+        }
+        return maxType;
+    }
+
+    function renderStep2() {
+        const container = document.getElementById("subjects-block");
+        container.innerHTML = `<div class="question-text">Выбери предметы, которые тебе даются лучше всего (до 5 штук):</div><div class="checkbox-group" id="subjectsCheck"></div>`;
+        const checkDiv = document.getElementById("subjectsCheck");
+        subjectList.forEach(subj => {
+            const label = document.createElement("label");
+            label.innerHTML = `<input type="checkbox" value="${subj}"> ${subj}`;
+            checkDiv.appendChild(label);
+        });
+        document.querySelectorAll("#subjectsCheck input").forEach(ch => {
+            if (userSubjects.includes(ch.value)) ch.checked = true;
+            ch.addEventListener("change", () => {
+                userSubjects = Array.from(document.querySelectorAll("#subjectsCheck input:checked")).map(i => i.value);
+                document.getElementById("nextStep3").disabled = (userSubjects.length === 0);
+            });
+        });
+        document.getElementById("nextStep3").disabled = (userSubjects.length === 0);
+    }
+
+    function recommendProfessions() {
+        const minSalary = parseInt(document.getElementById("salaryFilter").value) * 1000;
+        const demandChecked = {
+            high: document.getElementById("highDemand").checked,
+            mid: document.getElementById("midDemand").checked,
+            low: document.getElementById("lowDemand").checked
+        };
+        const remoteWanted = document.getElementById("remoteOk").checked;
+        const creativeWanted = document.getElementById("creativeOk").checked;
+        const bestType = calculateInterestType();
+
+        let scored = fullDB.map(prof => {
+            let points = 0;
+            if (prof.type === bestType) points += 4;
+            let matchSubj = prof.subjects.filter(s => userSubjects.includes(s)).length;
+            points += matchSubj * 2;
+            if (prof.salary * 1000 >= minSalary) points += 2;
+            else points -= 3;
+            if (demandChecked.high && prof.demand === "высокая") points += 2;
+            if (demandChecked.mid && prof.demand === "средняя") points += 1;
+            if (remoteWanted && prof.remote) points += 1;
+            if (creativeWanted && prof.creative) points += 1;
+            return { ...prof, points };
+        });
+        scored.sort((a,b) => b.points - a.points);
+        const top5 = scored.slice(0,5);
+
+        const resultsDiv = document.getElementById("resultsList");
+        resultsDiv.innerHTML = "";
+        top5.forEach(p => {
+            const card = document.createElement("div");
+            card.className = "result-card";
+            card.innerHTML = `
+                <div class="prof-title">${p.name}</div>
+                <div class="prof-detail">
+                    <span class="badge">📊 Тип: ${p.type}</span>
+                    <span class="badge">💰 от ${p.salary} тыс. руб</span>
+                    <span class="badge">📈 ${p.demand} востреб.</span>
+                    ${p.remote ? "<span class=\"badge\">🏠 Удалёнка</span>" : ""}
+                    ${p.creative ? "<span class=\"badge\">🎨 Творческая</span>" : ""}
+                </div>
+                <button class="more-btn" data-prof='${JSON.stringify(p)}'>📖 Подробнее</button>
+            `;
+            resultsDiv.appendChild(card);
+        });
+        document.querySelectorAll(".more-btn").forEach(btn => {
+            btn.addEventListener("click", () => showModal(JSON.parse(btn.dataset.prof)));
+        });
+    }
+
+    function showModal(prof) {
+        const modal = document.getElementById("profModal");
+        document.getElementById("modalTitle").textContent = prof.name;
+        document.getElementById("modalBody").innerHTML = `
+            <p><strong>📌 Описание:</strong> ${prof.description || "Востребованная профессия."}</p>
+            <h4>📚 Что нужно сдавать:</h4><p>${prof.exam || "Русский + профильные предметы"}</p>
+            <h4>🎓 Где учиться:</h4><p>${prof.universities || "НГУ, НГТУ, колледжи"}</p>
+            <h4>📈 Перспективы:</h4><p>${prof.prospects || `Зарплата от ${prof.salary} тыс.`}</p>
+        `;
+        modal.style.display = "flex";
+    }
+
+    function resetTest() {
+        userAnswers = new Array(10).fill(null);
+        userSubjects = [];
+        document.getElementById("salaryFilter").value = 40;
+        document.getElementById("salaryDisplay").innerText = "40 000 ₽";
+        document.getElementById("highDemand").checked = true;
+        document.getElementById("midDemand").checked = true;
+        document.getElementById("lowDemand").checked = false;
+        document.getElementById("remoteOk").checked = false;
+        document.getElementById("creativeOk").checked = false;
+    }
+
+    function showMainPage() {
+        document.getElementById("mainPage").classList.remove("hidden");
+        document.getElementById("step1").classList.add("hidden");
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step3").classList.add("hidden");
+        document.getElementById("results").classList.add("hidden");
+    }
+
+    function showStep1() {
+        resetTest();
+        renderStep1();
+        document.getElementById("mainPage").classList.add("hidden");
+        document.getElementById("step1").classList.remove("hidden");
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step3").classList.add("hidden");
+        document.getElementById("results").classList.add("hidden");
+    }
+
+    // ==================== НАВИГАЦИЯ ====================
+    document.getElementById("startTestBtn").onclick = () => showStep1();
+    document.getElementById("toMainFromStep1").onclick = () => showMainPage();
+    document.getElementById("toMainFromResults").onclick = () => showMainPage();
+
+    document.getElementById("nextStep2").onclick = () => {
+        document.getElementById("step1").classList.add("hidden");
+        document.getElementById("step2").classList.remove("hidden");
+        renderStep2();
+    };
+    document.getElementById("backStep1").onclick = () => {
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step1").classList.remove("hidden");
+    };
+    document.getElementById("nextStep3").onclick = () => {
+        if (userSubjects.length === 0) { alert("Выбери хотя бы 1 сильный предмет"); return; }
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step3").classList.remove("hidden");
+    };
+    document.getElementById("backStep2").onclick = () => {
+        document.getElementById("step3").classList.add("hidden");
+        document.getElementById("step2").classList.remove("hidden");
+    };
+    document.getElementById("getResults").onclick = () => {
+        recommendProfessions();
+        document.getElementById("step3").classList.add("hidden");
+        document.getElementById("results").classList.remove("hidden");
+    };
+    document.getElementById("restartBtn").onclick = () => {
+        resetTest();
+        renderStep1();
+        document.getElementById("results").classList.add("hidden");
+        document.getElementById("step1").classList.remove("hidden");
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step3").classList.add("hidden");
+    };
+
+    document.getElementById("salaryFilter").oninput = () => {
+        document.getElementById("salaryDisplay").innerText = document.getElementById("salaryFilter").value + " 000 ₽";
+    };
+
+    const modal = document.getElementById("profModal");
+    document.querySelector(".modal-close").onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+
+    // Показываем главную страницу при загрузке
+    showMainPage();
+</script>
+</body>
+</html>
